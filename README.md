@@ -18,10 +18,6 @@ There is also a `/sbonk` command that allows for timeframe and other things like
 ![Day Chart for AAPL](showcase/sbonksimplicit.png)
 ![Year Chart for AAPL](showcase/sbonkstimeframe.png)  
 
-## Craigslister  
-Sweet will fill this section in I just know it  
-![Sweet Need to Implement this](showcase/craigslist.png)  
-
 ## Games  
 GumBOTchi has some games you can play against your friends or against GumBOTchi.  
 You can do this by `right clicking your opponent's picture/name > Apps > Game of Your Choice`  
