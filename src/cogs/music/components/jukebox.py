@@ -40,7 +40,7 @@ class Jukebox(discord.ui.View):
 
     @property
     def total_pages(self) -> int:
-        """Calculate the total pages the queue takes"""
+        """Calculate the total pages the queue takes."""
         amount = len(utils.chunk(self.queue, self.PAGESIZE))
         return amount or 1  # cant have 0 pages
 
@@ -115,7 +115,7 @@ class Jukebox(discord.ui.View):
             self.disconnect()
         except NoVoiceClient:
             pass
-        
+
 
     def enqueue(self, song: Song):
         """Add a song to the queue."""

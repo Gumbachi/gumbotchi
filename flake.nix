@@ -35,7 +35,7 @@
         present. For safety, removal should
         be a manual step, even if trivial.
       */
-      version = "3.13";
+      version = "3.12";
     in
     {
       devShells = forEachSupportedSystem (
@@ -71,17 +71,20 @@
               venvVersionWarn
             '';
 
-            shellHook = ''source .env'';
+            shellHook = ''
+              export OPUS="${pkgs.libopus}/lib/libopus.so"
+              set -a
+              source .env
+              set +a
+            '';
 
-            environment.sessionVariables.OPUS = "${pkgs.libopus}/lib/libopus.so";
+            # environment.sessionVariables.OPUS = "${pkgs.libopus}/lib/libopus.so";
 
             packages = with python.pkgs; [
               venvShellHook
               uv
-
+              numpy
               pkgs.ffmpeg
-              pkgs.libopus
-
             ];
           };
         }

@@ -8,7 +8,7 @@ from yt_dlp import YoutubeDL
 from .errors import SongError
 
 YDL_OPTS = {
-    "format": "bestaudio/best",
+    "format": "ba",
     "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
     "restrictfilenames": True,
     "noplaylist": True,
