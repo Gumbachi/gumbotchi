@@ -1,37 +1,36 @@
 import shutil
 
 import discord
-from discord import option, slash_command
 
-from .components.jukebox import Jukebox
+from .model.jukebox import Jukebox
+from .ui.jukebox_view import JukeboxView
+
 
 class Music(discord.Cog):
     """Handles simple commands and listeners."""
 
-    def __init__(self, bot: discord.Bot):
-        self.bot = bot
-        self.players: dict[int, discord.Message] = {}
+    @discord.slash_command(name="viewtest")
+    async def send_testview(self, ctx: discord.ApplicationContext):
+        """Send a test view message."""
+        await ctx.respond(view=JukeboxView())
 
-    @slash_command(name="jukebox")
-    @option(name="fresh", description="Start with a brand new jukebox. Deletes the previous", default=False)
+    @discord.slash_command(name="jukebox")
+    @discord.option(name="fresh", description="Start with a brand new jukebox. Deletes the previous", default=False)
     async def send_jukebox(self, ctx: discord.ApplicationContext, fresh: bool):
         """Get the music player and its buttons."""
-        interaction = await ctx.respond("Establishing Vibe...")
+        # await ctx.response.defer()
 
-        if fresh:
-            if (jukebox := Jukebox.instances.pop(ctx.guild.id, None)):
-                jukebox.stop()
+        # stop and remove old jukebox if there is one
+        if fresh and (jukebox := Jukebox.instances.get(ctx.guild)):
+            jukebox.stop()
+            Jukebox.instances.pop(ctx.guild)
 
-        try:
-            jukebox = Jukebox.instances[ctx.guild.id]
-            await jukebox.message.delete()
-        except KeyError:
-            jukebox = Jukebox(ctx.guild)
-        except discord.NotFound:
-            pass  # ignore failed deletion
+        # get or create new jukebox
+        jukebox = Jukebox.instances.get(ctx.guild, Jukebox(ctx.guild))
+        view = JukeboxView(jukebox)
 
-        await ctx.send(embed=jukebox.embed, view=jukebox)
-        await interaction.edit_original_response(content="Vibe Established 🎧")
+        await ctx.response.send_message(view=view)
+        jukebox.view = view
 
 
 def setup(bot: discord.Bot):

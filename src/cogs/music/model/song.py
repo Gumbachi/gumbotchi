@@ -8,7 +8,11 @@ from yt_dlp import YoutubeDL
 from .errors import SongError
 
 YDL_OPTS = {
-    "format": "ba",
+    "format": "opus/bestaudio/best",
+    "postprocessors": [{  # Extract audio using ffmpeg
+        "key": "FFmpegExtractAudio",
+        "preferredcodec": "opus",
+    }],
     "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
     "restrictfilenames": True,
     "noplaylist": True,
@@ -28,28 +32,17 @@ FFMPEG_OPTS = {
 }
 
 
-class Song(discord.PCMVolumeTransformer):
+class Song(discord.FFmpegOpusAudio):
     """Represents song/youtube video as a discord audio object."""
 
-    __slots__ = (
-        "_metadata", "title", "duration_in_seconds",
-        "url", "webpage_url", "thumbnail", "songvolume"
-    )
-
-    def __init__(
-        self,
-        source: discord.FFmpegPCMAudio,
-        metadata: dict[str, Any],
-        volume: float = 0.5,
-    ) -> None:
-        super().__init__(original=source, volume=volume)
+    def __init__(self, metadata: dict[str, Any]):
+        super().__init__(source=metadata["url"], **FFMPEG_OPTS)
         self._metadata = metadata
         self.title: str = metadata["title"]
         self.duration_in_seconds: int = metadata["duration"]
         self.url: str = metadata["url"]
         self.webpage_url: str = metadata["webpage_url"]
         self.thumbnail: str = metadata["thumbnail"]
-        self.songvolume = volume
 
     def __str__(self):
         return f"[{self.title}]({self.webpage_url})\n{self.duration}"
@@ -59,11 +52,7 @@ class Song(discord.PCMVolumeTransformer):
 
     def clone(self):
         """Creates a duplicate discord Song object that hasn't been used."""
-        return Song(
-            source=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTS),
-            metadata=self._metadata,
-            volume=self.songvolume
-        )
+        return Song(metadata=self._metadata)
 
     @property
     def duration(self) -> str:
@@ -86,7 +75,6 @@ class Song(discord.PCMVolumeTransformer):
 
             try:
                 info = song_info["entries"][0]
-                audio = discord.FFmpegPCMAudio(info["url"], **FFMPEG_OPTS)
-                return cls(source=audio, metadata=info)
+                return cls(metadata=info)
             except IndexError:
                 raise SongError(f"No results found for {query}")

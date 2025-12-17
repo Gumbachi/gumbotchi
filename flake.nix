@@ -76,6 +76,7 @@
               set -a
               source .env
               set +a
+              source .venv/bin/activate
             '';
 
             # environment.sessionVariables.OPUS = "${pkgs.libopus}/lib/libopus.so";
@@ -84,6 +85,9 @@
               venvShellHook
               uv
               numpy
+              # ruff
+              python-lsp-server
+              python-lsp-ruff
               pkgs.ffmpeg
             ];
           };

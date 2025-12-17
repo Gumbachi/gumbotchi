@@ -9,8 +9,18 @@ def chunk(arr: list[Any], chunksize: int) -> list[list[Any]]:
     return [arr[i : i + chunksize] for i in range(0, len(arr), chunksize)]
 
 
-def ellipsize(text: str, maxsize: int = 64) -> str:
+def ellipsize(text: str, cutoff: int = 64) -> str:
     """Shrink a string to a certain size and ellipsize it"""
-    if len(text) < maxsize:
+    if len(text) < cutoff:
         return text
-    return text[:maxsize] + "..."
+    return text[:cutoff] + "..."
+
+def wrap_and_ellipsize(text: str, cutoff: int = 64) -> str:
+    """Shrink a string to a certain size and ellipsize it"""
+    if len(text) < cutoff:
+        return text
+
+    if len(text) < cutoff * 2:
+        return f"{text[:cutoff]}\n{text[cutoff:]}"
+
+    return f"{text[:cutoff]}\n{text[cutoff:cutoff * 2]}..."

@@ -371,7 +371,7 @@ dependencies = [
 requires-dist = [
     { name = "matplotlib", specifier = ">=3.9.2" },
     { name = "pandas", specifier = ">=2.2.3" },
-    { name = "py-cord", specifier = ">=2.7.0rc1" },
+    { name = "py-cord", specifier = ">=2.7.0rc2" },
     { name = "pymongo", specifier = ">=4.10.1" },
     { name = "pynacl", specifier = "==1.5.0" },
     { name = "requests" },
@@ -807,15 +807,15 @@ wheels = [
 
 [[package]]
 name = "py-cord"
-version = "2.7.0rc1"
+version = "2.7.0rc2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/b2/83d537c6b97cb7f49b1d92b7423f1823be9f3b3c400d2ba2cedd212252c7/py_cord-2.7.0rc1.tar.gz", hash = "sha256:cca759ebb0537cd3b69cd16e26287e667338a5283411c73ce61fa8f9892a7b40", size = 1102712, upload-time = "2025-08-30T21:19:43.182Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/68/a1/0df7ebaaf3cc8f7e565c052c4d106febdb6f4a6c8c4bca2c0c9bbc5b1d3b/py_cord-2.7.0rc2.tar.gz", hash = "sha256:988e245984f61c522935315fb859a8ca9ee492dd9298f4ec965a882b2f256172", size = 1122056, upload-time = "2025-10-22T10:16:52.661Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/2d/d963daa0376aae1ba7917f680802ebae26ef5579a69bafbe5a22360f269a/py_cord-2.7.0rc1-py3-none-any.whl", hash = "sha256:c4c3b930ad3572ebf5827c5f473942a577841d19281bdf5a8383cfee210ec202", size = 1172688, upload-time = "2025-08-30T21:19:41.582Z" },
+    { url = "https://files.pythonhosted.org/packages/61/6b/aada1243393f86258d2d995c1788529fe885c15f95c2c2fced319bd82c3c/py_cord-2.7.0rc2-py3-none-any.whl", hash = "sha256:097b4a3c4ff419591a72422e02d9097f56422eeb18a8217cb277986a36288f4f", size = 1203020, upload-time = "2025-10-22T10:16:50.958Z" },
 ]
 
 [[package]]

@@ -1,82 +1,32 @@
+from queue import Queue
+from typing import Self
+
 import discord
 
 import common.utils as utils
 from common.cfg import Tenor
 
-from ..embeds import NOTHING_PLAYING
-from ..enums import RepeatType
-from ..errors import NoVoiceClient
-from ..song import Song
-from .song_modal import SongModal
+from .enums import RepeatType
+from .errors import NoVoiceClient
+from .song import Song
+# from ..ui.song_modal import SongModal
 
 
-class Jukebox(discord.ui.View):
+class Jukebox:
 
-    instances: dict[int, "Jukebox"] = {}
-    PAGESIZE = 3
+    instances: dict[discord.Guild, Self] = {}
 
     def __init__(self, guild: discord.Guild):
         self.guild = guild
-        self.repeat = RepeatType.REPEATOFF
+
+        self.queue: Queue[Song] = []
         self.history: list[Song] = []
-        self.queue: list[Song] = []
+        self.repeat = RepeatType.REPEATOFF
         self.current: Song | None = None
         self.description = "Primed and ready"
         self.footer = ""
-        self.page = 1
-        self.cover_display = False
-        self.infinite = False
-        super().__init__(timeout=None)
 
-        # components for style changes from other components
-        self.history_select: discord.ui.Select = self.children[0]
-        self.rewind_button: discord.ui.Button = self.children[2]
-        self.play_button: discord.ui.Button = self.children[3]
-        self.skip_button: discord.ui.Button = self.children[4]
-        self.left_button: discord.ui.Button = self.children[7]
-        self.right_button: discord.ui.Button = self.children[9]
-
-        self.instances[guild.id] = self
-
-    @property
-    def total_pages(self) -> int:
-        """Calculate the total pages the queue takes."""
-        amount = len(utils.chunk(self.queue, self.PAGESIZE))
-        return amount or 1  # cant have 0 pages
-
-    @property
-    def embed(self) -> discord.Embed:
-        """The main display of the jukebox."""
-
-        if not self.current:
-            return NOTHING_PLAYING
-
-        if self.cover_display:
-            return discord.Embed(
-                title=f"{self.current.title}",
-                description=f"{self.current.duration}  •  [YouTube]({self.current.webpage_url})"
-            ).set_image(url=self.current.thumbnail)
-
-        embed = discord.Embed(
-            title="GumBOTchi's Jukebox",
-            description=f"*{self.description}*\n"
-        )
-        embed.set_thumbnail(url=self.current.thumbnail)
-        embed.set_footer(text=utils.ellipsize(self.footer))
-        embed.add_field(
-            name="NOW PLAYING",
-            value=f"[{self.current.title}]({self.current.webpage_url})\n",
-            inline=False,
-        )
-
-        if self.queue:
-            song_chunks = utils.chunk(self.queue, self.PAGESIZE)
-            embed.add_field(
-                name=f"UP NEXT  •  {len(self.queue)} Songs  •  Page {self.page}/{self.total_pages}",
-                value="\n\n".join([str(song) for song in song_chunks[self.page - 1]]),
-                inline=False,
-            )
-        return embed
+        self.instances[guild] = self
 
     @property
     def voice_client(self) -> discord.VoiceClient:
@@ -87,7 +37,7 @@ class Jukebox(discord.ui.View):
 
         raise NoVoiceClient("Voice Client Not Found")
 
-    def play(self, song: Song) -> None:
+    def play(self, song: Song):
         """Play the provided song."""
         self.current = song
 
@@ -99,8 +49,6 @@ class Jukebox(discord.ui.View):
 
     def stop(self) -> None:
         """Stop the jukebox from playing"""
-
-        print("STOPPING FOR WHATEVER REASON")
 
         self.current = None
 
@@ -164,7 +112,7 @@ class Jukebox(discord.ui.View):
         placeholder="Queue a song from history...",
         options=[
             discord.SelectOption(
-                label="PlACEHOLDER",
+                label="PLACEHOLDER",
                 description="You found an easter egg"
             )
         ],
@@ -172,7 +120,7 @@ class Jukebox(discord.ui.View):
     )
     async def history_select_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
 
-        if interaction.user.voice == None:
+        if interaction.user.voice is None:
             return await interaction.response.send_message(Tenor.KERMIT_LOST, ephemeral=True)
 
         await interaction.response.defer()
@@ -271,6 +219,15 @@ class Jukebox(discord.ui.View):
         self.update_page_buttons()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
+    def page_right(self):
+        if self.page < self.total_pages:
+            self.page += 1
+
+    def page_left(self):
+        if self.page > 1:
+            self.page -= 1
+
+
     @discord.ui.button(emoji="🪙", style=discord.ButtonStyle.gray, row=2)
     async def add_button_callback(self, button: discord.ui.Button, interaction: discord.Interaction):
         await interaction.response.send_modal(SongModal(self))
@@ -367,5 +324,3 @@ class Jukebox(discord.ui.View):
                 ephemeral=True
             )
             return False
-
-        return True
