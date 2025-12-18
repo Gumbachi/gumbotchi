@@ -1,7 +1,9 @@
+import asyncio
+
 import discord
 
 from common.cfg import Tenor
-from ..model.errors import NoVoiceClient, SongError
+from ..model.errors import SongError
 from ..model.song import Song
 
 class SongModal(discord.ui.DesignerModal):
@@ -28,16 +30,13 @@ class SongModal(discord.ui.DesignerModal):
         if interaction.user.voice is None:
             return await interaction.response.send_message(Tenor.KERMIT_LOST, ephemeral=True)
 
-        user_vc = interaction.user.voice.channel
-
         query = self.get_item("song-modal-input").value
 
         await interaction.response.defer()
 
-        try:
-            _ = self.jukebox.voice_client
-        except NoVoiceClient:
-            await user_vc.connect()
+        # Connect if no voice client already
+        if self.jukebox.voice_client is None:
+            await self.jukebox.connect(interaction.user.voice.channel)
 
         song = await Song.from_query(query, loop=self.jukebox.voice_client.loop)
 
@@ -45,10 +44,11 @@ class SongModal(discord.ui.DesignerModal):
             self.jukebox.play(song)
             self.jukebox.last_action = f"{interaction.user.display_name} added {song.title}"
         else:
+            if len(self.jukebox.queue) >= self.jukebox.max_queue:
+                self.view.update()
+                return await interaction.followup.send("Can't handle that many songs", ephemeral=True)
             self.jukebox.enqueue(song)
             self.jukebox.last_action = f"{interaction.user.display_name} queued {song.title}"
-
-        # await interaction.followup.delete()
 
         self.view.update()
         await interaction.message.edit(view=self.view)

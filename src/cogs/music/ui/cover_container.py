@@ -20,7 +20,7 @@ class CoverContainer(discord.ui.Container):
         section = discord.ui.Section()
         if jukebox.current:
             song = discord.ui.TextDisplay(f"**{jukebox.current.title}**")
-            artist = discord.ui.TextDisplay(f"{jukebox.current.duration}")
+            artist = discord.ui.TextDisplay(f"{jukebox.duration_bar}")
             url = jukebox.current.thumbnail
         else:
             song = discord.ui.TextDisplay("**Nothing playing**")
