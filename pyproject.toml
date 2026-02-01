@@ -10,7 +10,7 @@ dependencies = [
     "py-cord>=2.7.0rc2",
     "pynacl==1.5.0",
     "pymongo>=4.10.1",
-    "yt-dlp>=2025.12.8",
+    "yt-dlp>=2026.1.29",
     "requests"
 
     # "matplotlib==3.10.6",
